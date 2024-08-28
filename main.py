@@ -1,6 +1,7 @@
 import shutil
 from pathlib import Path
 from typing import Set
+from threading import Semaphore, Thread
 
 
 def find_files(path: Path) -> Set[Path]:
@@ -13,7 +14,7 @@ def find_files(path: Path) -> Set[Path]:
     return filepath_set
 
 
-def make_path(filepath_to: Path, filepath_set: Set[Path]) -> dict:
+def make_paths(filepath_to: Path, filepath_set: Set[Path]) -> dict:
     filepath_dict = {}
     for file_path in filepath_set:
         if not file_path.suffix:
@@ -28,9 +29,14 @@ def make_path(filepath_to: Path, filepath_set: Set[Path]) -> dict:
     return filepath_dict
 
 
-def copy_file(filepath_to: Path, filepath_set: Set[Path]) -> None:
-    file_paths = make_path(filepath_to, filepath_set)
-    for old_path, new_path in file_paths.items():
+def get_path(paths: dict):
+    return paths.popitem()
+
+
+def copy_file(paths: dict, condition) -> None:
+    copy_paths_dict = paths.copy()
+    old_path, new_path = get_path(copy_paths_dict)
+    with condition:
         shutil.copyfile(old_path, new_path)
 
 
@@ -38,5 +44,9 @@ if __name__ == '__main__':
     path_from = Path('images')
     path_to = Path('sorted_files')
     files_set = find_files(path_from)
+    files_old_and_new_paths = make_paths(path_to, files_set)
 
-    copy_file(path_to, files_set)
+    pool = Semaphore(4)
+    for _ in range(10):
+        thread = Thread(target=copy_file, args=(files_old_and_new_paths, pool))
+        thread.start()
