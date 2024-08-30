@@ -13,7 +13,7 @@ def factorize(*numbers):
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     number_list = [
         16,
         14_642_255,
@@ -160,16 +160,16 @@ if __name__ == '__main__':
         87_543,
         10_65_060,
         87_543,
-        3516
+        3516,
     ]
 
     start_1 = time.time()
     factorize(*number_list)
     print(time.time() - start_1)
-    print(f'Processing by 1 process\n')
+    print(f"Processing by 1 process\n")
 
     start_2 = time.time()
     with Pool(processes=8) as pool:
         pool.map(factorize, number_list)
     print(time.time() - start_2)
-    print(f'Processing by 8 process as Pool\n')
+    print(f"Processing by 8 process as Pool\n")
