@@ -17,7 +17,6 @@ def find_files(path_from: Path, path_to: Path):
         if x.is_file():
             with lock:
                 if x in handled_file_paths:
-                    # print(f'--- {threading.current_thread().name} checking {x}')
                     continue
                 handled_file_paths.add(x)
 
